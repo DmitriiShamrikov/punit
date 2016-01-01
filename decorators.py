@@ -1,11 +1,15 @@
-﻿from punit import *
+﻿# coding=utf-8
+import types
+from punit import *
 
 def TestFixture( cls ) :
-	g_fixtures.append( Fixture( cls ) )
+	if type( cls ) == types.ClassType :
+		g_fixtures.append( Fixture( cls ) )
 	return cls
 
 def Test( method ) :
-	g_funcs.append( RawFunc( method, FuncType.Test ) )
+	if type( method ) == types.FunctionType or type( method ) == types.MethodType :
+		g_funcs.append( RawFunc( method, FuncType.Test ) )
 	return method
 
 def Setup( method ) :

@@ -19,5 +19,5 @@ def Lol( x, y ) :
 	print x + y
 
 if __name__ == "__main__" :
-	RunTests()
+	RunAllTests()
 

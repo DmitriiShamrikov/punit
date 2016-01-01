@@ -1,5 +1,12 @@
-﻿import traceback
+﻿# coding=utf-8
+
+import traceback
 import types
+import os
+import codecs
+import re
+import imp
+import __main__ as main
 
 class PassException( AssertionError ) :
 	pass
@@ -152,13 +159,14 @@ class Fixture :
 			print traceback.format_exc()
 
 
-
-
 def RunTests() :
 	for fx in g_fixtures :
 		fx.RunTests()
 
 	for test in g_funcs :
+		if test.type != FuncType.Test or test.type != FuncType.TestCase :
+			continue
+
 		print "==================="
 		print test.func.func_name
 		try :
@@ -171,3 +179,21 @@ def RunTests() :
 			print e
 			print 
 			print traceback.format_exc()
+
+def RunAllTests() :
+	FindTests()
+	RunTests()
+
+def FindTests( path=os.getcwd() ) :
+	for i in os.listdir( path ) :
+		filename = os.path.abspath( os.path.join( path, i ) )
+		if os.path.isdir( filename ) :
+			FindTests( filename )
+		elif filename == main.__file__ :
+			continue
+		elif "." in filename.rsplit( os.path.sep, 1 )[ 1 ] and i.rsplit( ".", 1 )[ 1 ] == "py" :
+			with codecs.open( filename , "r", "utf-8" ) as f :
+				code = f.read()
+
+				if re.search( "^@(TestFixture|Test|TestCase\\()\\s", code, re.MULTILINE ) :
+					imp.load_source( "", filename )

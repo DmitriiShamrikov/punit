@@ -1,3 +1,5 @@
+﻿# coding=utf-8
+
 import math
 from punit import PassException
 
