@@ -1,6 +1,10 @@
 ﻿import traceback
 import types
 
+class PassException( AssertionError ) :
+	pass
+
+
 def ListRemove( lst, value ) :
 	try : 
 		lst.remove( value )
@@ -107,6 +111,10 @@ class Fixture :
 					try :
 						test.Run( fx )
 						print "OK"
+
+					except PassException as e :
+						print "OK" + ( " (" + e.message + ")" if e.message else "" )
+
 					except Exception as e :
 						print e
 						print 
