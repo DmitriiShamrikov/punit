@@ -33,6 +33,29 @@ class TestEntity :
 		self.name = name
 		self.func = func
 
+	def GetName( self ) :
+		name = self.name
+		args = []
+		if hasattr( self, "args" ) :
+			args += map( lambda x: str( x ), self.args )
+		if hasattr( self, "kvargs" ) :
+			args += map( lambda item : str( item[ 0 ] ) + "=" + str( item[ 1 ] ), self.kvargs.items() )
+		
+		if args :
+			name += "(" + ", ".join( args ) + ")"
+		return name
+
+	def Run( self, fx ) :
+		args = ( fx, ) 
+		if hasattr( self, "args" ) :
+			args = args + self.args
+		kvargs = {}
+		if hasattr( self, "kvargs" ) :
+			kvargs = self.kvargs
+
+		self.func( *args, **kvargs )
+
+
 
 class Fixture :
 
@@ -42,26 +65,30 @@ class Fixture :
 		self.tests = []
 		for name, method in cls.__dict__.items() :
 			if type( method ) == types.FunctionType :
-				for i in g_funcs :
-					if i.func == method :
-						g_funcs.remove( i )
-						if i.type == FuncType.Test :
+				i = 0
+				while i < len( g_funcs ) :
+					fi = g_funcs[ i ]
+					if fi.func == method :
+						if fi.type == FuncType.Test :
 							self.tests.append( TestEntity( name, method ) )
-						elif i.type == FuncType.TestCase :
+						elif fi.type == FuncType.TestCase :
 							te = TestEntity( name, method )
-							te.args = i.args
-							te.kvargs = i.kvargs
+							te.args = fi.args
+							te.kvargs = fi.kvargs
 							self.tests.append( te )
-						elif i.type == FuncType.Setup :
+						elif fi.type == FuncType.Setup :
 							self.setup = method
-						elif i.type == FuncType.Teardown :
+						elif fi.type == FuncType.Teardown :
 							self.teardown = method
-						elif i.type == FuncType.FixtureSetup :
+						elif fi.type == FuncType.FixtureSetup :
 							self.fxsetup = method
-						elif i.type == FuncType.FixtureTeardown :
+						elif fi.type == FuncType.FixtureTeardown :
 							self.fxteardown = method
+
+						g_funcs.pop( i )
+					else :
+						i += 1
 						
-						break
 
 	def RunTests( self ) :
 		fx = self.testclass()
@@ -70,20 +97,15 @@ class Fixture :
 				self.fxsetup( fx )
 
 			for test in self.tests :
+				
+
 				print "==================="
-				print self.name + " -- " + test.name
+				print self.name + " -- " + test.GetName()
 				try :
 					if hasattr( self, "setup" ) :
 						self.setup( fx )
-				
 					try :
-						args = ( fx, ) 
-						if hasattr( test, "args" ) :
-							args = args + test.args
-						kvargs = {}
-						if hasattr( test, "kvargs" ) :
-							kvargs = test.kvargs
-						test.func( *args, **kvargs )
+						test.Run( fx )
 						print "OK"
 					except Exception as e :
 						print e
@@ -127,3 +149,17 @@ class Fixture :
 def RunTests() :
 	for fx in g_fixtures :
 		fx.RunTests()
+
+	for test in g_funcs :
+		print "==================="
+		print test.func.func_name
+		try :
+			if test.type == FuncType.Test :
+				test.func()
+			else :
+				test.func( *test.args, **test.kvargs )
+			print "OK"
+		except Exception as e :
+			print e
+			print 
+			print traceback.format_exc()

@@ -5,8 +5,7 @@ def TestFixture( cls ) :
 	return cls
 
 def Test( method ) :
-	if method.func_code.co_argcount == 1 :
-		g_funcs.append( RawFunc( method, FuncType.Test ) )
+	g_funcs.append( RawFunc( method, FuncType.Test ) )
 	return method
 
 def Setup( method ) :
@@ -31,11 +30,10 @@ def TestFixtureTeardown( method ) :
 
 def TestCase( *args, **kvargs ) :
 	def wrapper( method ) :
-		if method.func_code.co_argcount > 1 :
-			f = RawFunc( method, FuncType.TestCase )
-			f.args = args
-			f.kvargs = kvargs
-			g_funcs.append( f )
+		f = RawFunc( method, FuncType.TestCase )
+		f.args = args
+		f.kvargs = kvargs
+		g_funcs.append( f )
 		return method
 
 	return wrapper
