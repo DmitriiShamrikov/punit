@@ -5,23 +5,13 @@ from assertions import *
 @TestFixture
 class TestClass :
 
-	@TestFixtureSetup
-	def init( this ) :
-		print "hi"
+	@TestCase( 1, 2 )
+	def Lol( self, x, y ) :
+		IsTrue( x + y > 0 )
 
-	@TestFixtureTeardown
-	def shutdown( this ) :
-		print "bye!"
-
-	@TestMethod
-	def TestFunction1( this ):
-		#print "call TestClass.TestFunction1"
-		IsTrue( False )
-
-	@TestMethod
-	def TestFunction2( this ) :
-		#print "call TestClass.TestFunction2"
-		AreEquals( 1, 1 )
+	@Test
+	def Lol1( self ):
+		pass
 
 
 if __name__ == "__main__" :

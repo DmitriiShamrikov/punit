@@ -47,6 +47,11 @@ class Fixture :
 						g_funcs.remove( i )
 						if i.type == FuncType.Test :
 							self.tests.append( TestEntity( name, method ) )
+						elif i.type == FuncType.TestCase :
+							te = TestEntity( name, method )
+							te.args = i.args
+							te.kvargs = i.kvargs
+							self.tests.append( te )
 						elif i.type == FuncType.Setup :
 							self.setup = method
 						elif i.type == FuncType.Teardown :
@@ -71,8 +76,14 @@ class Fixture :
 					if hasattr( self, "setup" ) :
 						self.setup( fx )
 				
-					try :					
-						test.func( fx )
+					try :
+						args = ( fx, ) 
+						if hasattr( test, "args" ) :
+							args = args + test.args
+						kvargs = {}
+						if hasattr( test, "kvargs" ) :
+							kvargs = test.kvargs
+						test.func( *args, **kvargs )
 						print "OK"
 					except Exception as e :
 						print e
