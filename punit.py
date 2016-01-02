@@ -22,6 +22,7 @@ def ListRemove( lst, value ) :
 
 g_fixtures = []
 g_funcs = []
+g_skip = {}
 
 class FuncType :
 	Test = 0
@@ -46,12 +47,25 @@ class TestEntity :
 			return self.name + "(" + ", ".join( args ) + ")"
 		
 	def Run( self, fx ) :
-		if self.type == FuncType.Test :
-			self.func( fx )
-		elif self.type == FuncType.TestCase :
-			args = ( fx, ) + self.args
-			kvargs = self.kvargs
-			self.func( *args, **kvargs )
+		try :
+			if self.type == FuncType.Test :
+				self.func( fx )
+			elif self.type == FuncType.TestCase :
+				args = ( fx, ) + self.args
+				kvargs = self.kvargs
+				self.func( *args, **kvargs )
+			print "OK"
+
+		except PassException as e :
+			print "OK" + ( " (" + e.message + ")" if e.message else "" )
+
+		except Exception as e :
+			print e
+			print 
+			print traceback.format_exc()
+			return False
+
+		return True
 
 
 class Fixture :
@@ -81,47 +95,57 @@ class Fixture :
 						g_funcs.pop( i )
 					else :
 						i += 1
-						
+	
+	def RunSetup( self, fx ) :
+		try :
+			if hasattr( self, "setup" ) :
+				self.setup( fx )
+			return True
+		except Exception as e :
+			print "Setup failed"
+			print e 
+			print
+			print traceback.format_exc()
+			return False
+
+	def RunTeardown( self, fx ) :
+		try :
+			if hasattr( self, "teardown" ) :
+				self.teardown( fx )
+			return True
+		except Exception as e :
+			print "Teardown failed"
+			print e 
+			print
+			print traceback.format_exc()
+			return False
 
 	def RunTests( self ) :
+		if self.testclass in g_skip :
+			print "%s: Skipped" % self.name
+			return
+
 		fx = self.testclass()
 		try :
 			if hasattr( self, "fxsetup" ) :
 				self.fxsetup( fx )
 
+			passed = 0
+			skipped = 0
 			for test in self.tests :
 
 				print "==================="
 				print self.name + "::" + test.GetName()
-				try :
-					if hasattr( self, "setup" ) :
-						self.setup( fx )
-					try :
-						test.Run( fx )
-						print "OK"
-
-					except PassException as e :
-						print "OK" + ( " (" + e.message + ")" if e.message else "" )
-
-					except Exception as e :
-						print e
-						print 
-						print traceback.format_exc()
-
-				except Exception as e :
-					print "Setup failed"
-					print e 
-					print
-					print traceback.format_exc()
+				if test.func in g_skip :
+					print "Skipped"
+					skipped += 1
+					continue
 				
-				try :
-					if hasattr( self, "teardown" ) :
-						self.teardown( fx )
-				except Exception as e :
-					print "Teardown failed"
-					print e 
-					print
-					print traceback.format_exc()
+				if self.RunSetup( fx ) and test.Run( fx ) :
+					passed += 1
+				self.RunTeardown( fx )
+
+			print "\n\n%s: passed %d/%d\n" % ( self.name, passed, len( self.tests ) - skipped )
 		
 		except Exception as e :
 			print "Failed setup for " + self.name
@@ -150,6 +174,10 @@ def RunTests() :
 
 		print "==================="
 		print test.func.func_name
+		if test.func in g_skip :
+			print "Skipped"
+			continue
+
 		try :
 			if test.type == FuncType.Test :
 				test.func()

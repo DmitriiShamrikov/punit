@@ -41,3 +41,7 @@ def TestCase( *args, **kvargs ) :
 		return method
 
 	return wrapper
+
+def Skip( methodOrClass ) :
+	g_skip[ methodOrClass ] = True
+	return methodOrClass
