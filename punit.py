@@ -39,6 +39,7 @@ class TestEntity :
 	def __init__( self, func, type ) :
 		self.func = func
 		self.type = type
+		self.skip = False
 
 	def GetName( self ) :
 		if self.type == FuncType.Test :
@@ -50,12 +51,23 @@ class TestEntity :
 	def Run( self, fx ) :
 		start = time.time()
 		try :
-			if self.type == FuncType.Test :
-				self.func( fx )
-			elif self.type == FuncType.TestCase :
-				args = ( fx, ) + self.args
-				kvargs = self.kvargs
-				self.func( *args, **kvargs )
+			if self.skip :
+				print "Skipped" 
+				return True
+
+			if fx :
+				if self.type == FuncType.Test :
+					self.func( fx )
+				elif self.type == FuncType.TestCase :
+					args = ( fx, ) + self.args
+					kvargs = self.kvargs
+					self.func( *args, **kvargs )
+			else :
+				if self.type == FuncType.Test :
+					self.func()
+				else :
+					self.func( *self.args, **self.kvargs )
+
 			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
 		except PassException as e :
@@ -180,21 +192,7 @@ def RunTests() :
 			print "Skipped"
 			continue
 
-		try :
-			start = time.time()
-			if test.type == FuncType.Test :
-				test.func()
-			else :
-				test.func( *test.args, **test.kvargs )
-			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
-
-		except PassException as e :
-			print "OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), " -" + e.message if e.message else "" ) 
-
-		except Exception as e :
-			print e
-			print 
-			print traceback.format_exc()
+		test.Run( None )
 
 def RunAllTests() :
 	FindTests()

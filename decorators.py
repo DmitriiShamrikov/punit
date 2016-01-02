@@ -34,10 +34,17 @@ def TestFixtureTeardown( method ) :
 
 def TestCase( *args, **kvargs ) :
 	def wrapper( method ) :
-		f = TestEntity( method, FuncType.TestCase )
-		f.args = args
-		f.kvargs = kvargs
-		g_funcs.append( f )
+		if type( method ) != types.FunctionType and type( method ) != types.MethodType :
+			return method
+
+		te = TestEntity( method, FuncType.TestCase )
+		te.args = args
+		te.skip = "skip" in kvargs and kvargs[ "skip" ]
+
+		if "skip" in kvargs :
+			del kvargs[ "skip" ]
+		te.kvargs = kvargs
+		g_funcs.append( te )
 		return method
 
 	return wrapper
