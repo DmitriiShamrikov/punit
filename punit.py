@@ -31,41 +31,27 @@ class FuncType :
 	FixtureSetup = 4
 	FixtureTeardown = 5
 
-class RawFunc :
+
+class TestEntity :
 
 	def __init__( self, func, type ) :
 		self.func = func
 		self.type = type
 
-
-class TestEntity :
-
-	def __init__( self, name, func ) :
-		self.name = name
-		self.func = func
-
 	def GetName( self ) :
-		name = self.name
-		args = []
-		if hasattr( self, "args" ) :
-			args += map( lambda x: str( x ), self.args )
-		if hasattr( self, "kvargs" ) :
-			args += map( lambda item : str( item[ 0 ] ) + "=" + str( item[ 1 ] ), self.kvargs.items() )
+		if self.type == FuncType.Test :
+			return self.name
+		elif self.type == FuncType.TestCase :
+			args = map( lambda x: str( x ), self.args ) + map( lambda item : str( item[ 0 ] ) + "=" + str( item[ 1 ] ), self.kvargs.items() )		
+			return self.name + "(" + ", ".join( args ) + ")"
 		
-		if args :
-			name += "(" + ", ".join( args ) + ")"
-		return name
-
 	def Run( self, fx ) :
-		args = ( fx, ) 
-		if hasattr( self, "args" ) :
-			args = args + self.args
-		kvargs = {}
-		if hasattr( self, "kvargs" ) :
+		if self.type == FuncType.Test :
+			self.func( fx )
+		elif self.type == FuncType.TestCase :
+			args = ( fx, ) + self.args
 			kvargs = self.kvargs
-
-		self.func( *args, **kvargs )
-
+			self.func( *args, **kvargs )
 
 
 class Fixture :
@@ -78,22 +64,18 @@ class Fixture :
 			if type( method ) == types.FunctionType :
 				i = 0
 				while i < len( g_funcs ) :
-					fi = g_funcs[ i ]
-					if fi.func == method :
-						if fi.type == FuncType.Test :
-							self.tests.append( TestEntity( name, method ) )
-						elif fi.type == FuncType.TestCase :
-							te = TestEntity( name, method )
-							te.args = fi.args
-							te.kvargs = fi.kvargs
-							self.tests.append( te )
-						elif fi.type == FuncType.Setup :
+					entity = g_funcs[ i ]
+					if entity.func == method :
+						if entity.type == FuncType.Test or entity.type == FuncType.TestCase:
+							entity.name = name
+							self.tests.append( entity )
+						elif entity.type == FuncType.Setup :
 							self.setup = method
-						elif fi.type == FuncType.Teardown :
+						elif entity.type == FuncType.Teardown :
 							self.teardown = method
-						elif fi.type == FuncType.FixtureSetup :
+						elif entity.type == FuncType.FixtureSetup :
 							self.fxsetup = method
-						elif fi.type == FuncType.FixtureTeardown :
+						elif entity.type == FuncType.FixtureTeardown :
 							self.fxteardown = method
 
 						g_funcs.pop( i )
@@ -108,10 +90,9 @@ class Fixture :
 				self.fxsetup( fx )
 
 			for test in self.tests :
-				
 
 				print "==================="
-				print self.name + " -- " + test.GetName()
+				print self.name + "::" + test.GetName()
 				try :
 					if hasattr( self, "setup" ) :
 						self.setup( fx )
@@ -164,7 +145,7 @@ def RunTests() :
 		fx.RunTests()
 
 	for test in g_funcs :
-		if test.type != FuncType.Test or test.type != FuncType.TestCase :
+		if test.type != FuncType.Test and test.type != FuncType.TestCase :
 			continue
 
 		print "==================="

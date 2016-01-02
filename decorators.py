@@ -9,32 +9,32 @@ def TestFixture( cls ) :
 
 def Test( method ) :
 	if type( method ) == types.FunctionType or type( method ) == types.MethodType :
-		g_funcs.append( RawFunc( method, FuncType.Test ) )
+		g_funcs.append( TestEntity( method, FuncType.Test ) )
 	return method
 
 def Setup( method ) :
 	if method.func_code.co_argcount == 1 :
-		g_funcs.append( RawFunc( method, FuncType.Setup ) )
+		g_funcs.append( TestEntity( method, FuncType.Setup ) )
 	return method
 
 def Teardown( method ) :
 	if method.func_code.co_argcount == 1 :
-		g_funcs.append( RawFunc( method, FuncType.Teardown ) )
+		g_funcs.append( TestEntity( method, FuncType.Teardown ) )
 	return method
 
 def TestFixtureSetup( method ) :
 	if method.func_code.co_argcount == 1 :
-		g_funcs.append( RawFunc( method, FuncType.FixtureSetup ) )
+		g_funcs.append( TestEntity( method, FuncType.FixtureSetup ) )
 	return method
 
 def TestFixtureTeardown( method ) :
 	if method.func_code.co_argcount == 1 :
-		g_funcs.append( RawFunc( method, FuncType.FixtureTeardown ) )
+		g_funcs.append( TestEntity( method, FuncType.FixtureTeardown ) )
 	return method
 
 def TestCase( *args, **kvargs ) :
 	def wrapper( method ) :
-		f = RawFunc( method, FuncType.TestCase )
+		f = TestEntity( method, FuncType.TestCase )
 		f.args = args
 		f.kvargs = kvargs
 		g_funcs.append( f )
