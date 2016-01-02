@@ -1,7 +1,5 @@
 ﻿# coding=utf-8
-
 import math
-from punit import PassException
 
 def IsTrue( value ) :
 	assert value, "Expected True"

@@ -14,9 +14,9 @@ class TestClass :
 	def Lol1( self ):
 		pass
 
-@TestCase( 1, 2 )
+@TestCase( 1, 2, result = 3 )
 def Lol( x, y ) :
-	print x + y
+	return x + y
 
 if __name__ == "__main__" :
 	RunAllTests()

@@ -39,13 +39,20 @@ def TestCase( *args, **kvargs ) :
 
 		te = TestEntity( method, FuncType.TestCase )
 		te.args = args
-		te.skip = "skip" in kvargs and kvargs[ "skip" ]
-		te.repeat = "repeat" in kvargs and kvargs[ "repeat" ]
 
 		if "skip" in kvargs :
+			te.skip = kvargs[ "skip" ]
 			del kvargs[ "skip" ]
 		if "repeat" in kvargs :
+			te.repeat = kvargs[ "repeat" ]
 			del kvargs[ "repeat" ]
+		if "description" in kvargs :
+			te.description = kvargs[ "description" ]
+			del kvargs[ "description" ]
+		if "result" in kvargs :
+			te.result = kvargs[ "result" ]
+			del kvargs[ "result" ]
+
 		te.kvargs = kvargs
 		g_funcs.append( te )
 		return method

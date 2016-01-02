@@ -9,6 +9,8 @@ import imp
 import time
 import __main__ as main
 
+import assertions
+
 class PassException( AssertionError ) :
 	pass
 
@@ -37,17 +39,22 @@ class FuncType :
 class TestEntity :
 
 	def __init__( self, func, type ) :
+		self.name = func.func_name
 		self.func = func
 		self.type = type
 		self.skip = False
 		self.repeat = 1
+		self.description = ""
+		self.result = None
 
 	def GetName( self ) :
-		if self.type == FuncType.Test :
-			return self.name
-		elif self.type == FuncType.TestCase :
+		name = self.name
+		if self.type == FuncType.TestCase :
 			args = map( lambda x: str( x ), self.args ) + map( lambda item : str( item[ 0 ] ) + "=" + str( item[ 1 ] ), self.kvargs.items() )		
-			return self.name + "(" + ", ".join( args ) + ")"
+			name += "(" + ", ".join( args ) + ")"
+		if self.description :
+			name += " -- " + self.description
+		return name
 		
 	def Run( self, fx ) :
 		start = time.time()
@@ -63,12 +70,15 @@ class TestEntity :
 					elif self.type == FuncType.TestCase :
 						args = ( fx, ) + self.args
 						kvargs = self.kvargs
-						self.func( *args, **kvargs )
+						result = self.func( *args, **kvargs )
 				else :
 					if self.type == FuncType.Test :
 						self.func()
 					else :
-						self.func( *self.args, **self.kvargs )
+						result = self.func( *self.args, **self.kvargs )
+
+				if self.result :
+					assertions.AreEqual( self.result, result )
 
 			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
@@ -97,7 +107,6 @@ class Fixture :
 					entity = g_funcs[ i ]
 					if entity.func == method :
 						if entity.type == FuncType.Test or entity.type == FuncType.TestCase:
-							entity.name = name
 							self.tests.append( entity )
 						elif entity.type == FuncType.Setup :
 							self.setup = method
@@ -189,7 +198,7 @@ def RunTests() :
 			continue
 
 		print "==================="
-		print test.func.func_name
+		print test.GetName()
 		if test.func in g_skip :
 			print "Skipped"
 			continue
