@@ -40,6 +40,7 @@ class TestEntity :
 		self.func = func
 		self.type = type
 		self.skip = False
+		self.repeat = 1
 
 	def GetName( self ) :
 		if self.type == FuncType.Test :
@@ -55,18 +56,19 @@ class TestEntity :
 				print "Skipped" 
 				return True
 
-			if fx :
-				if self.type == FuncType.Test :
-					self.func( fx )
-				elif self.type == FuncType.TestCase :
-					args = ( fx, ) + self.args
-					kvargs = self.kvargs
-					self.func( *args, **kvargs )
-			else :
-				if self.type == FuncType.Test :
-					self.func()
+			for i in range( self.repeat ) :
+				if fx :
+					if self.type == FuncType.Test :
+						self.func( fx )
+					elif self.type == FuncType.TestCase :
+						args = ( fx, ) + self.args
+						kvargs = self.kvargs
+						self.func( *args, **kvargs )
 				else :
-					self.func( *self.args, **self.kvargs )
+					if self.type == FuncType.Test :
+						self.func()
+					else :
+						self.func( *self.args, **self.kvargs )
 
 			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 

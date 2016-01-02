@@ -5,7 +5,7 @@ from assertions import *
 @TestFixture
 class TestClass :
 
-	@TestCase( 1, 2, k = 3, p = 4, skip=True )
+	@TestCase( 1, 2, k = 3, p = 4 )
 	@TestCase( 3, 4 )
 	def Lol( self, x, y, k = None, p = None ) :
 		IsTrue( x + y > 0 )
