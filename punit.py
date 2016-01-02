@@ -6,6 +6,7 @@ import os
 import codecs
 import re
 import imp
+import time
 import __main__ as main
 
 class PassException( AssertionError ) :
@@ -47,6 +48,7 @@ class TestEntity :
 			return self.name + "(" + ", ".join( args ) + ")"
 		
 	def Run( self, fx ) :
+		start = time.time()
 		try :
 			if self.type == FuncType.Test :
 				self.func( fx )
@@ -54,10 +56,10 @@ class TestEntity :
 				args = ( fx, ) + self.args
 				kvargs = self.kvargs
 				self.func( *args, **kvargs )
-			print "OK"
+			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
 		except PassException as e :
-			print "OK" + ( " (" + e.message + ")" if e.message else "" )
+			print "OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), " -" + e.message if e.message else "" ) 
 
 		except Exception as e :
 			print e
@@ -179,11 +181,16 @@ def RunTests() :
 			continue
 
 		try :
+			start = time.time()
 			if test.type == FuncType.Test :
 				test.func()
 			else :
 				test.func( *test.args, **test.kvargs )
-			print "OK"
+			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+
+		except PassException as e :
+			print "OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), " -" + e.message if e.message else "" ) 
+
 		except Exception as e :
 			print e
 			print 
