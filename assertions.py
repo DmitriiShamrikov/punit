@@ -57,17 +57,17 @@ def Throws( exceptionType, func, *args, **kvargs ) :
 	try :
 		func( *args, **kvargs )
 	except Exception as e :
-		assert type( e ) == exceptionType, "Expected exception of type " + str( exceptionType ) + ", but was " + str( type( e ) )
+		assert type( e ) == exceptionType, "Expected exception of type " + exceptionType.__name__ + ", but was " + type( e ).__name__
 	else :
-		raise AssertionError( "Expected exception of type " + str( exceptionType ) )
+		raise AssertionError( "Expected exception of type " + exceptionType.__name__ )
 
 def Catch( exceptionType, func, *args, **kvargs ) :
 	try :
 		func( *args, **kvargs )
 	except Exception as e :
-		assert isinstance( e, exceptionType ), "Expected exception of type " + str( exceptionType ) + " or derived, but was " + str( type( e ) )
+		assert isinstance( e, exceptionType ), "Expected exception of type " + exceptionType.__name__ + " or derived, but was " + type( e ).__name__
 	else :
-		raise AssertionError( "Expected exception of type " + str( exceptionType ) + " or derived" )
+		raise AssertionError( "Expected exception of type " + exceptionType.__name__ + " or derived" )
 
 def Pass( message=None ) :
 	raise PassException( message )

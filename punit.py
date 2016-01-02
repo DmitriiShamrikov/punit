@@ -46,6 +46,8 @@ class TestEntity :
 		self.repeat = 1
 		self.description = ""
 		self.result = None
+		self.exception = None
+		self.exceptionPattern = None
 
 	def GetName( self ) :
 		name = self.name
@@ -80,13 +82,25 @@ class TestEntity :
 				if self.result :
 					assertions.AreEqual( self.result, result )
 
+			if self.exception :
+				raise AssertionError( "Expected exception of type " + self.exception.__name__ )
+			
 			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
 		except PassException as e :
-			print "OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), " -" + e.message if e.message else "" ) 
+			print "OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), " - " + e.message if e.message else "" )
+
+		except self.exception as e :
+			if self.exceptionPattern and not re.match( self.exceptionPattern, e.message ) :
+				print str( e ) + " (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+				print 
+				print traceback.format_exc()
+				return False
+			else :
+				print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
 		except Exception as e :
-			print e
+			print str( e ) + " (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 			print 
 			print traceback.format_exc()
 			return False

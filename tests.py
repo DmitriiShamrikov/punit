@@ -14,8 +14,9 @@ class TestClass :
 	def Lol1( self ):
 		pass
 
-@TestCase( 1, 2, result = 3 )
+@TestCase( 1, 2, result = 3, exception = ValueError )
 def Lol( x, y ) :
+	raise ValueError()
 	return x + y
 
 if __name__ == "__main__" :

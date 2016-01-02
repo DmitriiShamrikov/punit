@@ -52,6 +52,12 @@ def TestCase( *args, **kvargs ) :
 		if "result" in kvargs :
 			te.result = kvargs[ "result" ]
 			del kvargs[ "result" ]
+		if "exception" in kvargs :
+			te.exception = kvargs[ "exception" ]
+			del kvargs[ "exception" ]
+		if "exceptionPattern" in kvargs :
+			te.exceptionPattern = kvargs[ "exceptionPattern" ]
+			del kvargs[ "exceptionPattern" ]
 
 		te.kvargs = kvargs
 		g_funcs.append( te )
