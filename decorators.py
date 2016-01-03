@@ -3,7 +3,7 @@ import types
 from punit import *
 
 def TestFixture( cls ) :
-	if type( cls ) == types.ClassType :
+	if type( cls ) == types.ClassType or type( cls ) == types.TypeType :
 		g_fixtures.append( Fixture( cls ) )
 	return cls
 
