@@ -2,56 +2,56 @@
 import math
 
 def IsTrue( value ) :
-	assert value, "Expected True"
+	assert value, u"Expected True"
 
 def IsFalse( value ) :
-	assert not value, "Expected False"
+	assert not value, u"Expected False"
 
 def IsNone( value ) :
-	assert value == None, "Expected " + str( value ) + " is None"
+	assert value == None, u"Expected " + unicode( value ) + u" is None"
 
 def IsNotNone( value ) :
-	assert value == None, "Expected " + str( value ) + " is not None"
+	assert value == None, u"Expected " + unicode( value ) + u" is not None"
 
 def IsNan( value ) :
-	assert type( value ) == float, "Expected float, but was " + str( type( value ) )
-	assert math.isnan( value ), "Expected NaN, but was " + str( value )
+	assert type( value ) == float, u"Expected float, but was " + unicode( type( value ) )
+	assert math.isnan( value ), u"Expected NaN, but was " + unicode( value )
 
 def IsNotNan( value ) :
-	assert type( value ) == float, "Expected float, but was " + str( type( value ) )
-	assert not math.isnan( value ), "Expected not NaN"
+	assert type( value ) == float, u"Expected float, but was " + unicode( type( value ) )
+	assert not math.isnan( value ), u"Expected not NaN"
 
 def IsEmpty( value ) :
 	assert type( value ) == string or type( value ) == list or type( value ) == dict
-	assert not value, "Expected empty, but was " + str( value )
+	assert not value, u"Expected empty, but was " + unicode( value )
 
 def IsNotEmpty( value ) :
 	assert type( value ) == string or type( value ) == list or type( value ) == dict
-	assert value, "Expected not empty value"
+	assert value, u"Expected not empty value"
 
 def AreEqual( expected, actual ) :
-	assert expected == actual, "Expected " + str( expected ) + ", but was " + str( actual )
+	assert expected == actual, u"Expected " + unicode( expected ) + u", but was " + unicode( actual )
 
 def AreNotEqual( expected, actual ) :
-	assert expected != actual, "Expected not " + str( expected ) + ", but was " + str( actual )
+	assert expected != actual, u"Expected not " + unicode( expected ) + u", but was " + unicode( actual )
 
 def AreSame( expected, actual ) :
-	assert expected is actual, "Expected " + str( expected ) + " is the same that " + str( actual )
+	assert expected is actual, u"Expected " + unicode( expected ) + u" is the same that " + unicode( actual )
 
 def AreNotSame( expected, actual ) :
-	assert expected is not actual, "Expected " + str( expected ) + " is not the same that " + str( actual )
+	assert expected is not actual, u"Expected " + unicode( expected ) + u" is not the same that " + unicode( actual )
 
 def Greater( v1, v2 ) :
-	assert v1 > v2, "Expected " + str( v1 ) + " > " + str( v2 )
+	assert v1 > v2, u"Expected " + unicode( v1 ) + u" > " + unicode( v2 )
 
 def GreaterOrEqual( v1, v2 ) :
-	assert v1 > v2, "Expected " + str( v1 ) + " >= " + str( v2 )
+	assert v1 > v2, u"Expected " + unicode( v1 ) + u" >= " + unicode( v2 )
 
 def Less( v1, v2 ) :
-	assert v1 < v2, "Expected " + str( v1 ) + " < " + str( v2 )
+	assert v1 < v2, u"Expected " + unicode( v1 ) + u" < " + unicode( v2 )
 
 def LessOrEqual( v1, v2 ) :
-	assert v1 < v2, "Expected " + str( v1 ) + " <= " + str( v2 )
+	assert v1 < v2, u"Expected " + unicode( v1 ) + u" <= " + unicode( v2 )
 
 def Throws( exceptionType, func, *args, **kvargs ) :
 	try :

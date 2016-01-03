@@ -52,17 +52,17 @@ class TestEntity :
 	def GetName( self ) :
 		name = self.name
 		if self.type == FuncType.TestCase :
-			args = map( lambda x: str( x ), self.args ) + map( lambda item : str( item[ 0 ] ) + "=" + str( item[ 1 ] ), self.kvargs.items() )		
-			name += "(" + ", ".join( args ) + ")"
+			args = map( lambda x: unicode( x ), self.args ) + map( lambda item : unicode( item[ 0 ] ) + u"=" + unicode( item[ 1 ] ), self.kvargs.items() )		
+			name += u"(" + u", ".join( args ) + u")"
 		if self.description :
-			name += " -- " + self.description
+			name += u" -- " + self.description
 		return name
 		
 	def Run( self, fx ) :
 		start = time.time()
 		try :
 			if self.skip :
-				print "Skipped" 
+				print u"Skipped" 
 				return True
 
 			for i in range( self.repeat ) :
@@ -85,22 +85,22 @@ class TestEntity :
 			if self.exception :
 				raise AssertionError( "Expected exception of type " + self.exception.__name__ )
 			
-			print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+			print u"OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
 		except PassException as e :
-			print "OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), " - " + e.message if e.message else "" )
+			print u"OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), u" - " + e.message if e.message else u"" )
 
 		except self.exception as e :
 			if self.exceptionPattern and not re.match( self.exceptionPattern, e.message ) :
-				print str( e ) + " (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+				print unicode( e ) + u" (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 				print 
 				print traceback.format_exc()
 				return False
 			else :
-				print "OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+				print u"OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 
 		except Exception as e :
-			print str( e ) + " (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+			print unicode( e ) + u" (%d ms)" % int( ( time.time() - start ) * 1000.0 )
 			print 
 			print traceback.format_exc()
 			return False
@@ -141,7 +141,7 @@ class Fixture :
 				self.setup( fx )
 			return True
 		except Exception as e :
-			print "Setup failed"
+			print u"Setup failed"
 			print e 
 			print
 			print traceback.format_exc()
@@ -153,7 +153,7 @@ class Fixture :
 				self.teardown( fx )
 			return True
 		except Exception as e :
-			print "Teardown failed"
+			print u"Teardown failed"
 			print e 
 			print
 			print traceback.format_exc()
@@ -161,7 +161,7 @@ class Fixture :
 
 	def RunTests( self ) :
 		if self.testclass in g_skip :
-			print "%s: Skipped" % self.name
+			print u"%s: Skipped" % self.name
 			return
 
 		fx = self.testclass()
@@ -173,10 +173,10 @@ class Fixture :
 			skipped = 0
 			for test in self.tests :
 
-				print "==================="
+				print u"==================="
 				print self.name + "::" + test.GetName()
 				if test.func in g_skip :
-					print "Skipped"
+					print u"Skipped"
 					skipped += 1
 					continue
 				
@@ -184,10 +184,10 @@ class Fixture :
 					passed += 1
 				self.RunTeardown( fx )
 
-			print "\n\n%s: passed %d/%d\n" % ( self.name, passed, len( self.tests ) - skipped )
+			print u"\n\n%s: passed %d/%d\n" % ( self.name, passed, len( self.tests ) - skipped )
 		
 		except Exception as e :
-			print "Failed setup for " + self.name
+			print u"Failed setup for " + self.name
 			print e 
 			print
 			print traceback.format_exc()
@@ -197,7 +197,7 @@ class Fixture :
 				self.fxteardown( fx )
 
 		except Exception as e :
-			print "Failed teardown for " + self.name
+			print u"Failed teardown for " + self.name
 			print e 
 			print
 			print traceback.format_exc()
@@ -211,10 +211,10 @@ def RunTests() :
 		if test.type != FuncType.Test and test.type != FuncType.TestCase :
 			continue
 
-		print "==================="
+		print u"==================="
 		print test.GetName()
 		if test.func in g_skip :
-			print "Skipped"
+			print u"Skipped"
 			continue
 
 		test.Run( None )
