@@ -52,7 +52,8 @@ class TestEntity :
 	def GetName( self ) :
 		name = self.name
 		if self.type == FuncType.TestCase :
-			args = map( lambda x: unicode( x ), self.args ) + map( lambda item : unicode( item[ 0 ] ) + u"=" + unicode( item[ 1 ] ), self.kvargs.items() )		
+			args = map( lambda x: unicode( x ) if type( x ) != str and type( x ) != unicode else ( "'" + unicode( x ) + "'" ), self.args ) \
+				 + map( lambda item : unicode( item[ 0 ] ) + u"=" + unicode( item[ 1 ] ), self.kvargs.items() )
 			name += u"(" + u", ".join( args ) + u")"
 		if self.description :
 			name += u" -- " + self.description
@@ -184,7 +185,7 @@ class Fixture :
 					passed += 1
 				self.RunTeardown( fx )
 
-			print u"\n\n%s: passed %d/%d\n" % ( self.name, passed, len( self.tests ) - skipped )
+			print u"\n\n%s: passed %d/%d (%d skipped)\n" % ( self.name, passed, len( self.tests ) - skipped, skipped )
 		
 		except Exception as e :
 			print u"Failed setup for " + self.name
@@ -207,17 +208,33 @@ def RunTests() :
 	for fx in g_fixtures :
 		fx.RunTests()
 
+	testsByFiles = {}
 	for test in g_funcs :
-		if test.type != FuncType.Test and test.type != FuncType.TestCase :
-			continue
+		file = os.path.relpath( test.func.func_code.co_filename )
+		if file not in testsByFiles :
+			testsByFiles[ file ] = []
+		testsByFiles[ file ].append( test )
 
-		print u"==================="
-		print test.GetName()
-		if test.func in g_skip :
-			print u"Skipped"
-			continue
+	for file, tests in testsByFiles.items() :
+		passed = 0
+		skipped = 0
+		for test in tests :
+			if test.type != FuncType.Test and test.type != FuncType.TestCase :
+				continue
 
-		test.Run( None )
+			print u"==================="
+			print test.GetName()
+			if test.func in g_skip :
+				print u"Skipped"
+				skipped += 1
+				continue
+
+			if test.Run( None ) :
+				passed += 1
+
+		print u"\n\n%s: passed %d/%d (%d skipped)\n" % ( file, passed, len( tests ) - skipped, skipped )
+
+
 
 def RunAllTests() :
 	FindTests()
