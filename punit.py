@@ -26,6 +26,9 @@ def ListRemove( lst, value ) :
 g_fixtures = []
 g_funcs = []
 g_skip = {}
+g_totalSkipped = 0
+g_totalPassed = 0
+g_totalRunned = 0
 
 class FuncType :
 	Test = 0
@@ -42,7 +45,6 @@ class TestEntity :
 		self.name = func.func_name
 		self.func = func
 		self.type = type
-		self.skip = False
 		self.repeat = 1
 		self.description = ""
 		self.result = None
@@ -61,11 +63,9 @@ class TestEntity :
 		
 	def Run( self, fx ) :
 		start = time.time()
+		global g_totalRunned
+		g_totalRunned += 1
 		try :
-			if self.skip :
-				print u"Skipped" 
-				return True
-
 			for i in range( self.repeat ) :
 				if fx :
 					if self.type == FuncType.Test :
@@ -161,8 +161,12 @@ class Fixture :
 			return False
 
 	def RunTests( self ) :
+		global g_totalSkipped
+		global g_totalPassed
+
 		if self.testclass in g_skip :
 			print u"%s: Skipped" % self.name
+			g_totalSkipped += len( self.tests )
 			return
 
 		fx = self.testclass()
@@ -179,10 +183,12 @@ class Fixture :
 				if test.func in g_skip :
 					print u"Skipped"
 					skipped += 1
+					g_totalSkipped += 1
 					continue
 				
 				if self.RunSetup( fx ) and test.Run( fx ) :
 					passed += 1
+					g_totalPassed += 1
 				self.RunTeardown( fx )
 
 			print u"\n\n%s: passed %d/%d (%d skipped)\n" % ( self.name, passed, len( self.tests ) - skipped, skipped )
@@ -205,6 +211,14 @@ class Fixture :
 
 
 def RunTests() :
+	global g_totalSkipped
+	global g_totalPassed
+	global g_totalRunned
+
+	g_totalSkipped = 0
+	g_totalPassed = 0
+	g_totalRunned = 0
+
 	for fx in g_fixtures :
 		fx.RunTests()
 
@@ -227,13 +241,16 @@ def RunTests() :
 			if test.func in g_skip :
 				print u"Skipped"
 				skipped += 1
+				g_totalSkipped += 1
 				continue
 
 			if test.Run( None ) :
 				passed += 1
+				g_totalPassed += 1
 
 		print u"\n\n%s: passed %d/%d (%d skipped)\n" % ( file, passed, len( tests ) - skipped, skipped )
 
+	print "Total: passed %d/%d (%d skipped)\n" % ( g_totalPassed, g_totalRunned, g_totalSkipped )
 
 
 def RunAllTests() :

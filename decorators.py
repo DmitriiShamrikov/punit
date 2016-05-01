@@ -41,7 +41,7 @@ def TestCase( *args, **kvargs ) :
 		te.args = args
 
 		if "skip" in kvargs :
-			te.skip = kvargs[ "skip" ]
+			g_skip[ method ] = True
 			del kvargs[ "skip" ]
 		if "repeat" in kvargs :
 			te.repeat = kvargs[ "repeat" ]
