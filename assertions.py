@@ -11,7 +11,7 @@ def IsNone( value ) :
 	assert value == None, u"Expected " + unicode( value ) + u" is None"
 
 def IsNotNone( value ) :
-	assert value == None, u"Expected " + unicode( value ) + u" is not None"
+	assert value != None, u"Expected " + unicode( value ) + u" is not None"
 
 def IsNan( value ) :
 	assert type( value ) == float, u"Expected float, but was " + unicode( type( value ) )
@@ -22,11 +22,11 @@ def IsNotNan( value ) :
 	assert not math.isnan( value ), u"Expected not NaN"
 
 def IsEmpty( value ) :
-	assert type( value ) == string or type( value ) == list or type( value ) == dict
+	assert isinstance( value, basestring ) or isinstance( value, list ) or isinstance( value, dict )
 	assert not value, u"Expected empty, but was " + unicode( value )
 
 def IsNotEmpty( value ) :
-	assert type( value ) == string or type( value ) == list or type( value ) == dict
+	assert isinstance( value, basestring ) or isinstance( value, list ) or isinstance( value, dict )
 	assert value, u"Expected not empty value"
 
 def AreEqual( expected, actual ) :
