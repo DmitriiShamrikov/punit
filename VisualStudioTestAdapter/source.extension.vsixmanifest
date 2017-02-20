@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+	<Metadata>
+		<Identity Id="PunitTestAdapter.Black Overlord.f04db9cd-8a71-4ff5-a2b4-806239317d8c" Version="1.0" Language="en-US" Publisher="Black Overlord" />
+		<DisplayName>Punit Test Adapter</DisplayName>
+		<Description xml:space="preserve">Visual Studio extension for using Punit test framework with test explorer.</Description>
+	</Metadata>
+	<Installation>
+		<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
+	</Installation>
+	<Dependencies>
+		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+	</Dependencies>
+	<Assets>
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" d:VsixSubPath="|VisualStudioTestAdapter|" Path="|%CurrentProject%|" />
+		<Asset Type="UnitTestExtension" d:Source="Project" d:ProjectName="%CurrentProject%" d:VsixSubPath="|VisualStudioTestAdapter|" Path="|%CurrentProject%|" />
+	</Assets>
+</PackageManifest>
