@@ -264,7 +264,7 @@ def FindTests( path=os.getcwd() ) :
 			FindTests( filename )
 		elif filename == main.__file__ :
 			continue
-		elif "." in filename.rsplit( os.path.sep, 1 )[ 1 ] and i.rsplit( ".", 1 )[ 1 ] == "py" :
+		elif "." in filename.rsplit( os.path.sep, 1 )[ 1 ] and i.rsplit( ".", 1 )[ 1 ] in [ "py", "pyw" ] :
 			with codecs.open( filename , "r", "utf-8" ) as f :
 				code = f.read()
 
