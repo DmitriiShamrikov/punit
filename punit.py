@@ -160,11 +160,11 @@ class Fixture :
 			print traceback.format_exc()
 			return False
 
-	def RunTests( self ) :
+	def RunTests( self, forceRunSkipped=False ) :
 		global g_totalSkipped
 		global g_totalPassed
 
-		if self.testclass in g_skip :
+		if self.testclass in g_skip and not forceRunSkipped :
 			print u"%s: Skipped" % self.name
 			g_totalSkipped += len( self.tests )
 			return
@@ -180,7 +180,7 @@ class Fixture :
 
 				print u"==================="
 				print self.name + "::" + test.GetName()
-				if test.func in g_skip :
+				if test.func in g_skip and not forceRunSkipped :
 					print u"Skipped"
 					skipped += 1
 					g_totalSkipped += 1
@@ -210,7 +210,7 @@ class Fixture :
 			print traceback.format_exc()
 
 
-def RunTests() :
+def RunTests( forceRunSkipped=False ) :
 	global g_totalSkipped
 	global g_totalPassed
 	global g_totalRunned
@@ -220,7 +220,7 @@ def RunTests() :
 	g_totalRunned = 0
 
 	for fx in g_fixtures :
-		fx.RunTests()
+		fx.RunTests( forceRunSkipped )
 
 	testsByFiles = {}
 	for test in g_funcs :
@@ -238,7 +238,7 @@ def RunTests() :
 
 			print u"==================="
 			print test.GetName()
-			if test.func in g_skip :
+			if test.func in g_skip and not forceRunSkipped :
 				print u"Skipped"
 				skipped += 1
 				g_totalSkipped += 1
