@@ -12,6 +12,7 @@
     <OutputPath>.</OutputPath>
     <Name>Punit</Name>
     <RootNamespace>Punit</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.6-32</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,6 +29,9 @@
     <Compile Include="decorators.py" />
     <Compile Include="punit.py" />
     <Compile Include="tests.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.6-32" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

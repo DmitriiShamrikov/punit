@@ -2,7 +2,7 @@
 from punit import *
 
 def TestFixture( cls ) :
-	if type( cls ) == types.ClassType or type( cls ) == types.TypeType or isinstance( cls, type ) :
+	if isinstance( cls, type ) :
 		g_fixtures.append( Fixture( cls ) )
 	return cls
 

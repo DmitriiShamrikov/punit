@@ -1,6 +1,4 @@
-﻿# coding=utf-8
-
-import traceback
+﻿import traceback
 import types
 import os
 import codecs
@@ -39,10 +37,10 @@ class FuncType :
 	FixtureTeardown = 5
 
 
-class TestEntity :
+class TestEntity( object ) :
 
 	def __init__( self, func, type ) :
-		self.name = func.func_name
+		self.name = func.__name__
 		self.func = func
 		self.type = type
 		self.repeat = 1
@@ -54,11 +52,11 @@ class TestEntity :
 	def GetName( self ) :
 		name = self.name
 		if self.type == FuncType.TestCase :
-			args = map( lambda x: unicode( x ) if type( x ) != str and type( x ) != unicode else ( "'" + unicode( x ) + "'" ), self.args ) \
-				 + map( lambda item : unicode( item[ 0 ] ) + u"=" + unicode( item[ 1 ] ), self.kvargs.items() )
-			name += u"(" + u", ".join( args ) + u")"
+			args =  [ str( x ) if type( x ) != str else ( "'" + str( x ) + "'" ) for x in self.args ]
+			args += [ str( item[ 0 ] ) + "=" + str( item[ 1 ] ) for item in self.kvargs.items() ]
+			name += "(" + ", ".join( args ) + ")"
 		if self.description :
-			name += u" -- " + self.description
+			name += " -- " + self.description
 		return name
 		
 	def Run( self, fx ) :
@@ -86,24 +84,24 @@ class TestEntity :
 			if self.exception :
 				raise AssertionError( "Expected exception of type " + self.exception.__name__ )
 			
-			print u"OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+			print( "OK ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
 
 		except PassException as e :
-			print u"OK (%d ms)%s" % ( int( ( time.time() - start ) * 1000.0 ), u" - " + e.message if e.message else u"" )
+			print( "OK ({0} ms)%s".format( int( ( time.time() - start ) * 1000.0 ), u" - " + e.message if e.message else u"" ) )
 
 		except self.exception as e :
 			if self.exceptionPattern and not re.match( self.exceptionPattern, e.message ) :
-				print unicode( e ) + u" (%d ms)" % int( ( time.time() - start ) * 1000.0 )
-				print 
-				print traceback.format_exc()
+				print( str( e ) + " ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
+				print()
+				print( traceback.format_exc() )
 				return False
 			else :
-				print u"OK (%d ms)" % int( ( time.time() - start ) * 1000.0 )
+				print( "OK ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
 
 		except Exception as e :
-			print unicode( e ) + u" (%d ms)" % int( ( time.time() - start ) * 1000.0 )
-			print 
-			print traceback.format_exc()
+			print( str( e ) + " ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
+			print()
+			print( traceback.format_exc() )
 			return False
 
 		return True
@@ -142,10 +140,10 @@ class Fixture :
 				self.setup( fx )
 			return True
 		except Exception as e :
-			print u"Setup failed"
-			print e 
-			print
-			print traceback.format_exc()
+			print( "Setup failed" )
+			print( e )
+			print()
+			print( traceback.format_exc() )
 			return False
 
 	def RunTeardown( self, fx ) :
@@ -154,10 +152,10 @@ class Fixture :
 				self.teardown( fx )
 			return True
 		except Exception as e :
-			print u"Teardown failed"
-			print e 
-			print
-			print traceback.format_exc()
+			print( "Teardown failed" )
+			print( e )
+			print()
+			print( traceback.format_exc() )
 			return False
 
 	def RunTests( self, forceRunSkipped=False ) :
@@ -165,7 +163,7 @@ class Fixture :
 		global g_totalPassed
 
 		if self.testclass in g_skip and not forceRunSkipped :
-			print u"%s: Skipped" % self.name
+			print( self.name + ": Skipped" )
 			g_totalSkipped += len( self.tests )
 			return
 
@@ -178,10 +176,10 @@ class Fixture :
 			skipped = 0
 			for test in self.tests :
 
-				print u"==================="
-				print self.name + "::" + test.GetName()
+				print( "===================" )
+				print( self.name + "::" + test.GetName() )
 				if test.func in g_skip and not forceRunSkipped :
-					print u"Skipped"
+					print( "Skipped" )
 					skipped += 1
 					g_totalSkipped += 1
 					continue
@@ -191,23 +189,23 @@ class Fixture :
 					g_totalPassed += 1
 				self.RunTeardown( fx )
 
-			print u"\n\n%s: passed %d/%d (%d skipped)\n" % ( self.name, passed, len( self.tests ) - skipped, skipped )
+			print( "\n\n{0}: passed {1}/{2} ({3} skipped)\n".format( self.name, passed, len( self.tests ) - skipped, skipped ) )
 		
 		except Exception as e :
-			print u"Failed setup for " + self.name
-			print e 
-			print
-			print traceback.format_exc()
+			print( "Failed setup for " + self.name )
+			print( e )
+			print()
+			print( traceback.format_exc() )
 
 		try :
 			if hasattr( self, "fxteardown" ) :
 				self.fxteardown( fx )
 
 		except Exception as e :
-			print u"Failed teardown for " + self.name
-			print e 
-			print
-			print traceback.format_exc()
+			print( "Failed teardown for " + self.name )
+			print( e )
+			print()
+			print( traceback.format_exc() )
 
 
 def RunTests( forceRunSkipped=False ) :
@@ -224,7 +222,7 @@ def RunTests( forceRunSkipped=False ) :
 
 	testsByFiles = {}
 	for test in g_funcs :
-		file = os.path.relpath( test.func.func_code.co_filename )
+		file = os.path.relpath( test.func.__code__.co_filename )
 		if file not in testsByFiles :
 			testsByFiles[ file ] = []
 		testsByFiles[ file ].append( test )
@@ -236,10 +234,10 @@ def RunTests( forceRunSkipped=False ) :
 			if test.type != FuncType.Test and test.type != FuncType.TestCase :
 				continue
 
-			print u"==================="
-			print test.GetName()
+			print( "===================" )
+			print( test.GetName() )
 			if test.func in g_skip and not forceRunSkipped :
-				print u"Skipped"
+				print( "Skipped" )
 				skipped += 1
 				g_totalSkipped += 1
 				continue
@@ -248,9 +246,9 @@ def RunTests( forceRunSkipped=False ) :
 				passed += 1
 				g_totalPassed += 1
 
-		print u"\n\n%s: passed %d/%d (%d skipped)\n" % ( file, passed, len( tests ) - skipped, skipped )
+		print( "\n\n{0}: passed {1}/{2} ({3} skipped)\n".format( file, passed, len( tests ) - skipped, skipped ) )
 
-	print "Total: passed %d/%d (%d skipped)\n" % ( g_totalPassed, g_totalRunned, g_totalSkipped )
+	print( "Total: passed {0}/{1} ({2} skipped)\n".format( g_totalPassed, g_totalRunned, g_totalSkipped ) )
 
 
 def RunAllTests() :
@@ -265,8 +263,8 @@ def FindTests( path=os.getcwd() ) :
 		elif filename == main.__file__ :
 			continue
 		elif "." in filename.rsplit( os.path.sep, 1 )[ 1 ] and i.rsplit( ".", 1 )[ 1 ] in [ "py", "pyw" ] :
-			with codecs.open( filename , "r", "utf-8" ) as f :
+			with open( filename , "r", encoding="utf-8" ) as f :
 				code = f.read()
 
-				if re.search( "^@(TestFixture|Test|TestCase\\()\\s", code, re.MULTILINE ) :
+				if re.search( r"^@(TestFixture|Test|TestCase\()\s", code, re.MULTILINE ) :
 					imp.load_source( "", filename )
