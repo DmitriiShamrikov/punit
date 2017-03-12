@@ -1,9 +1,8 @@
-﻿# coding=utf-8
-import types
+﻿import types
 from punit import *
 
 def TestFixture( cls ) :
-	if type( cls ) == types.ClassType or type( cls ) == types.TypeType :
+	if type( cls ) == types.ClassType or type( cls ) == types.TypeType or isinstance( cls, type ) :
 		g_fixtures.append( Fixture( cls ) )
 	return cls
 
