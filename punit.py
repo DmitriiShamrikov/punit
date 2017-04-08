@@ -87,22 +87,22 @@ class TestEntity( object ) :
 			print( "OK ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
 
 		except PassException as e :
-			print( "OK ({0} ms)%s".format( int( ( time.time() - start ) * 1000.0 ), u" - " + e.message if e.message else u"" ) )
+			print( "OK ({0} ms)%s".format( int( ( time.time() - start ) * 1000.0 ), " - " + e.args[ 0 ] if e.args[ 0 ] else "" ) )
 
-		except self.exception as e :
-			if self.exceptionPattern and not re.match( self.exceptionPattern, e.message ) :
+		except BaseException as e :
+			if self.exception and isinstance( e, self.exception ) :
+				if self.exceptionPattern and not re.match( self.exceptionPattern, e.args[ 0 ] ) :
+					print( str( e ) + " ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
+					print()
+					print( traceback.format_exc() )
+					return False
+				else :
+					print( "OK ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
+			else :
 				print( str( e ) + " ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
 				print()
 				print( traceback.format_exc() )
 				return False
-			else :
-				print( "OK ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
-
-		except Exception as e :
-			print( str( e ) + " ({0} ms)".format( int( ( time.time() - start ) * 1000.0 ) ) )
-			print()
-			print( traceback.format_exc() )
-			return False
 
 		return True
 

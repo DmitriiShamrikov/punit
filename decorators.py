@@ -12,22 +12,22 @@ def Test( method ) :
 	return method
 
 def Setup( method ) :
-	if method.func_code.co_argcount == 1 :
+	if method.__code__.co_argcount == 1 :
 		g_funcs.append( TestEntity( method, FuncType.Setup ) )
 	return method
 
 def Teardown( method ) :
-	if method.func_code.co_argcount == 1 :
+	if method.__code__.co_argcount == 1 :
 		g_funcs.append( TestEntity( method, FuncType.Teardown ) )
 	return method
 
 def TestFixtureSetup( method ) :
-	if method.func_code.co_argcount == 1 :
+	if method.__code__.co_argcount == 1 :
 		g_funcs.append( TestEntity( method, FuncType.FixtureSetup ) )
 	return method
 
 def TestFixtureTeardown( method ) :
-	if method.func_code.co_argcount == 1 :
+	if method.__code__.co_argcount == 1 :
 		g_funcs.append( TestEntity( method, FuncType.FixtureTeardown ) )
 	return method
 
